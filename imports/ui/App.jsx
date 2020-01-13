@@ -14,9 +14,12 @@ class App extends Component{
     super(props);
     this.state ={
       textInput: '',
+      itemChecker: '',
+      isPrivate: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -25,12 +28,18 @@ class App extends Component{
     this.setState({[event.target.name]: value});
   }
 
-  
+  handleCheckboxChange(event) {
+    const value = event.target.checked;
+    this.setState({[event.target.name]: value});
+  }
+
   handleSubmit(event) {
     const text = this.state.textInput;
+    const isPrivate = this.state.isPrivate;
     event.preventDefault();
     Items.insert({
       text,
+      isPrivate,
       createdAt: new Date(),
       owner: Meteor.userId(),
       username: Meteor.user().username, 
@@ -40,7 +49,17 @@ class App extends Component{
   }
   
   renderItems() {
-    return this.props.items.map((item) => (
+    let filteredItems = this.props.items;
+    filteredItems = filteredItems.filter(item => !item.isPrivate);
+    return filteredItems.map((item) => (
+      <Item key={item._id} item={item} />
+    ));
+  }
+
+  renderPrivateItems() {
+    let filteredItems = this.props.items;
+    filteredItems = filteredItems.filter(item => item.isPrivate && item.owner == Meteor.userId());
+    return filteredItems.map((item) => (
       <Item key={item._id} item={item} />
     ));
   }
@@ -60,12 +79,23 @@ class App extends Component{
                 placeholder="Add an item to the shoppinglist"
                 onChange={this.handleChange}
               />
+              <input
+                type="checkbox"
+                ref="isPrivate"
+                name="isPrivate"
+                onChange={this.handleCheckboxChange}
+              />
             </form> : ''
           }
 
         </header>
         <ul>
           {this.renderItems()}
+        </ul>
+        <br />
+        <h1>Private items</h1>
+        <ul>
+          {this.renderPrivateItems()}
         </ul>
       </div>
     )

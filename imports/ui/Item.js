@@ -1,6 +1,8 @@
 import React from 'react';
 import { Component } from 'react';
 import { Items } from '../api/items.js';
+import { Meteor } from 'meteor/meteor';
+
 
 
 export default class Item extends Component {
@@ -11,13 +13,16 @@ export default class Item extends Component {
             <button className='delete' onClick={ this.deleteItem.bind(this)}>
             &times;
             </button>
-            <input
-                type="checkbox"
-                readOnly
-                checked={!!this.props.item.checked}
-                onClick={this.toggleChecked.bind(this)}
-            />
-            <span className="text">{this.props.item.text}</span>
+            { Meteor.user() ?
+                <input
+                    type="checkbox"
+                    readOnly
+                    checked={!!this.props.item.checked}
+                    onClick={this.toggleChecked.bind(this)}
+                />
+                : ''
+            }
+            <span className="text">{this.props.item.text} { this.props.item.checked ? this.props.item.checkedUser : '' } </span>
             <br />  
             <b>{this.props.item.username}</b>
         </li>
@@ -28,6 +33,12 @@ export default class Item extends Component {
         Items.update(this.props.item._id, {
             $set: { checked: !this.props.item.checked },
         });
+        if(this.props.item.checked) {
+            Items.update(this.props.item._id, {
+                $set: { checkedUser:  Meteor.user().username},
+            });
+        }
+
     }
 
     deleteItem() {
