@@ -4,8 +4,10 @@ import React from 'react';
 import { withTracker } from 'meteor/react-meteor-data';
 import { Items } from '../api/items.js';
 import { Component } from 'react';
+import { Meteor } from 'meteor/meteor';
 
 import Item from './Item.js';
+import AccountsUIWrapper from './AccountsUIWrapper.js';
 
 class App extends Component{
   constructor(props) {
@@ -30,6 +32,8 @@ class App extends Component{
     Items.insert({
       text,
       createdAt: new Date(),
+      owner: Meteor.userId(),
+      username: Meteor.user().username, 
     });
     
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
@@ -46,15 +50,18 @@ class App extends Component{
       <div className='container'>
         <header>
           <h1>Shoppinglist</h1>
-          <form className="newItem" onSubmit={this.handleSubmit}>
-            <input
-              type="text"
-              ref="textInput"
-              name="textInput"
-              placeholder="Add an item to the shoppinglist"
-              onChange={this.handleChange}
-            />
-          </form>
+          <AccountsUIWrapper />
+          { this.props.currentUser ?
+            <form className="newItem" onSubmit={this.handleSubmit}>
+              <input
+                type="text"
+                ref="textInput"
+                name="textInput"
+                placeholder="Add an item to the shoppinglist"
+                onChange={this.handleChange}
+              />
+            </form> : ''
+          }
 
         </header>
         <ul>
@@ -68,5 +75,6 @@ class App extends Component{
 export default withTracker(() => {
   return {
     items: Items.find({}).fetch(),
+    currentUser: Meteor.user(),
   };
 })(App);

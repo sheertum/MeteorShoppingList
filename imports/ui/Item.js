@@ -11,6 +11,8 @@ export default class Item extends Component {
             &times;
             </button>
             {this.props.item.text}
+            <br />  
+            <b>{this.props.item.username}</b>
         </li>
         );
     }
