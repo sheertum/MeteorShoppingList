@@ -15,6 +15,7 @@ class App extends Component{
     this.state ={
       textInput: '',
       itemChecker: '',
+      assignee: '',
       isPrivate: false,
     };
 
@@ -36,17 +37,23 @@ class App extends Component{
   handleSubmit(event) {
     const text = this.state.textInput;
     const isPrivate = this.state.isPrivate;
+    const assignee = this.state.assignee;
     event.preventDefault();
     Items.insert({
       text,
       isPrivate,
+      assignee,
       createdAt: new Date(),
       owner: Meteor.userId(),
       username: Meteor.user().username, 
     });
-    
-    ReactDOM.findDOMNode(this.refs.textInput).value = '';
+    this.resetFormFieldsToDefault()
+  }
+
+  resetFormFieldsToDefault() {
+    ReactDOM.findDOMNode(this.refs.textInput).value = "";
     ReactDOM.findDOMNode(this.refs.isPrivate).checked = false;
+    ReactDOM.findDOMNode(this.refs.assignee).value = "";
   }
   
   renderItems() {
@@ -71,6 +78,13 @@ class App extends Component{
     return this.props.items.filter(item => item.isPrivate && item.owner == Meteor.userId());
   }
 
+  renderAssignees() {
+    let candidates = Meteor.users.find().fetch();
+    return candidates.map((candidate) => (
+      <option key={candidate.username} value={candidate.username}>{candidate.username}</option>
+    ))
+  }
+
   render() {
     return (
       <div className='container'>
@@ -79,24 +93,35 @@ class App extends Component{
           <AccountsUIWrapper />
           { this.props.currentUser ?
             <form className="newItem" onSubmit={this.handleSubmit}>
+              <label>Make a new item</label>
+              <br />
               <input
                 type="text"
                 ref="textInput"
                 name="textInput"
                 placeholder="Add an item to the shoppinglist"
-                onChange={this.handleChange}
+                onChange={ this.handleChange }
               />
+              <label>Private:</label>
               <input
                 type="checkbox"
                 ref="isPrivate"
                 name="isPrivate"
-                onChange={this.handleCheckboxChange}
+                onChange={ this.handleCheckboxChange }
               />
-              <input
+              <br />
+              <label>Select a person to assign the new item to</label>
+              <br />
+              <select
                 type="combobox"
                 ref="assignee"
                 name="assignee"
-              />
+                onChange={ this.handleChange }
+                defaultValue=""
+              >
+                <option value="" disabled>Select your option</option>
+                {this.renderAssignees()}
+              </select>
             </form> : ''
           }
 

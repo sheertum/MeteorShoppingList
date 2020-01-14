@@ -22,7 +22,10 @@ export default class Item extends Component {
                 />
                 : ''
             }
-            <span className="text">{this.props.item.text} { this.props.item.checked ? this.props.item.checkedUser : '' } </span>
+            <span className="text">
+                {this.props.item.text} { this.props.item.checked ? this.props.item.checkedUser : '' }
+                <i>Assigned to {this.props.item.assignee}</i>
+            </span>
             <br />  
             <b>{this.props.item.username}</b>
         </li>
