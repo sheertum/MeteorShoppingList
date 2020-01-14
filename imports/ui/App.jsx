@@ -46,22 +46,29 @@ class App extends Component{
     });
     
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
+    ReactDOM.findDOMNode(this.refs.isPrivate).checked = false;
   }
   
   renderItems() {
-    let filteredItems = this.props.items;
-    filteredItems = filteredItems.filter(item => !item.isPrivate);
+    let filteredItems = this.getPublicItems();
     return filteredItems.map((item) => (
       <Item key={item._id} item={item} />
     ));
   }
 
+  getPublicItems() {
+    return this.props.items.filter(item => !item.isPrivate);
+  }
+
   renderPrivateItems() {
-    let filteredItems = this.props.items;
-    filteredItems = filteredItems.filter(item => item.isPrivate && item.owner == Meteor.userId());
+    let filteredItems = this.getPrivateItems();
     return filteredItems.map((item) => (
       <Item key={item._id} item={item} />
     ));
+  }
+
+  getPrivateItems() {
+    return this.props.items.filter(item => item.isPrivate && item.owner == Meteor.userId());
   }
 
   render() {
@@ -84,6 +91,11 @@ class App extends Component{
                 ref="isPrivate"
                 name="isPrivate"
                 onChange={this.handleCheckboxChange}
+              />
+              <input
+                type="combobox"
+                ref="assignee"
+                name="assignee"
               />
             </form> : ''
           }
