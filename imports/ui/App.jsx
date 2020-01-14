@@ -113,7 +113,6 @@ class App extends Component{
               <label>Select a person to assign the new item to</label>
               <br />
               <select
-                type="combobox"
                 ref="assignee"
                 name="assignee"
                 onChange={ this.handleChange }
