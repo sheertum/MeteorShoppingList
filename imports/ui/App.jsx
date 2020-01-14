@@ -32,6 +32,7 @@ class App extends Component{
   handleCheckboxChange(event) {
     const value = event.target.checked;
     this.setState({[event.target.name]: value});
+    ReactDOM.findDOMNode(this.refs.assignee).value = "";
   }
 
   handleSubmit(event) {
@@ -47,7 +48,7 @@ class App extends Component{
       owner: Meteor.userId(),
       username: Meteor.user().username, 
     });
-    this.resetFormFieldsToDefault()
+    this.resetFormFieldsToDefault();
   }
 
   resetFormFieldsToDefault() {
@@ -117,6 +118,7 @@ class App extends Component{
                 name="assignee"
                 onChange={ this.handleChange }
                 defaultValue=""
+                disabled={this.state.isPrivate}
               >
                 <option value="" disabled>Select your option</option>
                 {this.renderAssignees()}
